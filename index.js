@@ -50,6 +50,14 @@ async function run() {
             res.send(result);
         });
 
+        // Show single item from foods data base:
+        app.get('/allfoods/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await allFoodsCollection.findOne(query);
+            res.send(result);
+        })
+
         // Delete newItems from myAddedItems
 
         app.delete('/additems/:id', async (req, res) => {
@@ -59,6 +67,36 @@ async function run() {
             res.send(result);
         })
 
+        // Update added Items step 1: 
+        app.get('/additems/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await newItemsCollection.findOne(query);
+            res.send(result);
+        })
+
+        // Update added Items step: 2
+
+        app.put('/additems/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedItems = req.body;
+            const newItems = {
+                $set: {
+                    foodname: updatedItems.foodname,
+                    email: updatedItems.email,
+                    category: updatedItems.category,
+                    price: updatedItems.price,
+                    quantity: updatedItems.quantity,
+                    image: updatedItems.image,
+                    origin: updatedItems.origin,
+                    description: updatedItems.description
+                }
+            }
+            const result = await newItemsCollection.updateOne(filter, newItems, options);
+            res.send(result);
+        })
 
 
         // Send a ping to confirm a successful connection
