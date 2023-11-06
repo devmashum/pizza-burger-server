@@ -3,7 +3,7 @@ const cors = require('cors');
 const app = express();
 require('dotenv').config();
 const port = process.env.PORT || 3000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // middleware
 app.use(cors());
@@ -38,7 +38,7 @@ async function run() {
         })
         // Get newItems from the DataBase
 
-        app.get('/addItems', async (req, res) => {
+        app.get('/additems', async (req, res) => {
             const cursor = newItemsCollection.find();
             const result = await cursor.toArray();
             res.send(result);
@@ -47,6 +47,15 @@ async function run() {
         app.get('/allfoods', async (req, res) => {
             const cursor = allFoodsCollection.find();
             const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        // Delete newItems from myAddedItems
+
+        app.delete('/additems/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await newItemsCollection.deleteOne(query);
             res.send(result);
         })
 
