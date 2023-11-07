@@ -28,6 +28,8 @@ async function run() {
         await client.connect();
         const newItemsCollection = client.db('Pizza-Burger').collection('newItems');
         const allFoodsCollection = client.db('Pizza-Burger').collection('allFoods');
+        const myCartCollection = client.db('Pizza-Burger').collection('mycart');
+        const itemListCollection = client.db('Pizza-Burger').collection('itemlist');
 
         // Create newItems 
         app.post('/additems', async (req, res) => {
@@ -43,6 +45,31 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
+
+        // Add the product to mycart Database
+        app.post('/mycart', async (req, res) => {
+            const newFood = req.body;
+            console.log(newFood);
+            const result = await myCartCollection.insertOne(newFood);
+            res.send(result);
+        })
+        // Get the mycart data from the database:
+
+        app.get('/mycart', async (req, res) => {
+            const cursor = myCartCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+        // Delete items from mycart:
+        app.delete('/mycart/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await myCartCollection.deleteOne(query);
+            res.send(result);
+        })
+
+
         // Get all Foods data from DataBase
         app.get('/allfoods', async (req, res) => {
             const cursor = allFoodsCollection.find();
@@ -95,6 +122,13 @@ async function run() {
                 }
             }
             const result = await newItemsCollection.updateOne(filter, newItems, options);
+            res.send(result);
+        })
+        // add the item list from Purchase Page
+        app.post('/itemlist', async (req, res) => {
+            const newItems = req.body;
+            console.log(newItems);
+            const result = await itemListCollection.insertOne(newItems);
             res.send(result);
         })
 
