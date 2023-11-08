@@ -30,6 +30,7 @@ async function run() {
         const allFoodsCollection = client.db('Pizza-Burger').collection('allFoods');
         const myCartCollection = client.db('Pizza-Burger').collection('mycart');
         const itemListCollection = client.db('Pizza-Burger').collection('itemlist');
+        const cardCollection = client.db('Pizza-Burger').collection('card');
 
         // Create newItems 
         app.post('/additems', async (req, res) => {
@@ -45,6 +46,13 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
+        // Get Card collection to show in home page
+        app.get('/card', async (req, res) => {
+            const cursor = cardCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
 
         // Add the product to mycart Database
         app.post('/mycart', async (req, res) => {
@@ -72,7 +80,14 @@ async function run() {
 
         // Get all Foods data from DataBase
         app.get('/allfoods', async (req, res) => {
-            const cursor = allFoodsCollection.find();
+            console.log(req.query);
+
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
+            const cursor = allFoodsCollection.find()
+                .skip(page * size)
+                .limit(size)
+
             const result = await cursor.toArray();
             res.send(result);
         });
